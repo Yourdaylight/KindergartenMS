@@ -1,0 +1,103 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>幼儿园介绍</title>
+  <style>
+    /* 页面样式 */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      color: #333;
+    }
+    header {
+      background-color: #007acc;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 48px;
+    }
+    section {
+      margin: 20px;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    h2 {
+      margin: 0;
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+    p {
+      margin: 0;
+      line-height: 1.5;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    .info {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+    }
+    .info-item {
+      flex-basis: 49%;
+      margin-bottom: 20px;
+    }
+    .info-label {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .info-value {
+      font-size: 18px;
+    }
+	.container {
+			display: flex;
+			flex-wrap: wrap;
+		}
+    .container > section {
+        flex-basis: 46%;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+    @media screen and (max-width: 768px) {
+    .container > section {
+        flex-basis: 100%;
+    }
+}
+    footer {
+      background-color: #333;
+      color: #fff;
+      padding: 10px;
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>欢迎来到我们的幼儿园</h1>
+    <p>让孩子在快乐、健康、安全的环境中全面发展</p>
+  </header>
+  <section>
+    <h2>基本情况</h2>
+      {{basic_info}}
+</section>
+  <div class="container">
+      {{sub_info}}
+  </div>
+
+</body>
+</html>

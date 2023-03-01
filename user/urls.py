@@ -5,7 +5,7 @@
 # @Software: PyCharm
 
 from django.urls import path
-from . import user_views, group_views,teacher_views
+from . import user_views, group_views,teacher_views,admin_views
 
 urlpatterns = [
     path('', user_views.login, name='login'),
@@ -23,4 +23,11 @@ urlpatterns = [
     # 老师操作
     path('api/v1/report_student/', teacher_views.report_student, name='report_student'),
     path('api/v1/search_student_history/', teacher_views.search_student_history, name='search_student_info'),
+    path('api/v1/upload_students_info/', teacher_views.upload_students_info, name='search_student_info'),
+    # 公告板相关
+    path('api/v1/get_board_html/', admin_views.get_board_html, name='get_board_html'),
+    path('api/v1/get_board_config/', admin_views.get_board_config, name='get_board_config'),
+    path('api/v1/update_board_config/', admin_views.update_board_config, name='update_board_config'),
+    path('api/v1/restore_board_config/', admin_views.restore_board_config, name='restored_board_config'),
+
 ]

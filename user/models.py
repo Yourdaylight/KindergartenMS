@@ -10,12 +10,19 @@ class User(models.Model):
         (3, "Parent"),
     )
     role = models.CharField(max_length=10, choices=user_type_choices)
-    full_name = models.CharField(max_length=100)
+    full_name = models.CharField(max_length=100,)
     username = models.CharField(max_length=100)
     password = models.CharField(max_length=100)
     email = models.EmailField(max_length=100)
     phone = models.CharField(max_length=100)
     class_no = models.CharField(max_length=100)
+    #设置性别只能是男或女
+    sex_choices = (
+        ("女", "女"),
+        ("男", "男"),
+
+    )
+    sex = models.CharField(max_length=3,choices=sex_choices,default="男")
     update_time = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -38,15 +45,15 @@ class StudentDaily(models.Model):
     student_id = models.CharField(max_length=100)
     teacher_id = models.CharField(max_length=100)
     class_no = models.CharField(max_length=100)
-    date = models.DateField()
-    temperature = models.FloatField()
+    date = models.DateField(default='2020-01-01')
+    temperature = models.FloatField(null=True, blank=True)
     # 学生的今日学习评分，吃饭评分，睡觉评分，社交评分，礼仪举止评分，体育锻炼评分。
-    study_score = models.FloatField()
-    eat_score = models.FloatField()
-    sleep_score = models.FloatField()
-    social_score = models.FloatField()
-    etiquette_score = models.FloatField()
-    sport_score = models.FloatField()
+    study_score = models.FloatField(null=True)
+    eat_score = models.FloatField(null=True)
+    sleep_score = models.FloatField(null=True)
+    social_score = models.FloatField(null=True)
+    etiquette_score = models.FloatField(null=True)
+    sport_score = models.FloatField(null=True)
     # 老师今日对学生的评价
     teacher_comment = models.CharField(max_length=2048)
 

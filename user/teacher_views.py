@@ -15,6 +15,7 @@ from django.views.decorators.http import require_http_methods
 from .models import User, StudentDaily
 from django.db.models import Q
 from django.forms.models import model_to_dict
+import pandas as pd
 import datetime
 import traceback
 
@@ -127,3 +128,50 @@ def search_student_history(request):
     except Exception as e:
         print(traceback.format_exc())
         return JsonResponse({"code": 500, "msg": "failed: " + str(e), "data": None})
+
+
+@require_http_methods(["POST"])
+def upload_students_info(request):
+    """
+    上传学生信息
+    :param request:
+    :return:
+    """
+    try:
+        # 　文件从vue中传过来
+        file = request.FILES.get("file")
+        table = request.POST.get("table")
+        upload_teacher_id = request.POST.get("teacher_id", -1)
+        # 读取文件
+        with open(file.name, "wb") as f:
+            for chunk in file.chunks():
+                f.write(chunk)
+        file_name = file.name
+        data = pd.read_csv(file_name)
+        # 将数据转换为字典
+        data = data.to_dict(orient="records")
+        # 将数据存入数据库
+        if table == "user":
+            for item in data:
+                # 判断学生是否存在
+                student = User.objects.filter(username=item["username"], role="3")
+                if student:
+                    raise Exception(f"学生用户名{item['username']}已存在")
+                item["role"] = "3"
+                User.objects.create(**item)
+        elif table == "daily":
+            for item in data:
+                # 判断学生是否存在
+                student = User.objects.filter(id=item["student_id"], role="3")
+                if not student:
+                    raise Exception(f"学生id{item['student_id']}不存在，请检查后重新上传")
+                item["student_id"] = student[0].id
+                item["teacher_id"] = upload_teacher_id
+                item["date"] = datetime.datetime.strptime(item["date"], "%Y-%m-%d")
+                StudentDaily.objects.create(**item)
+        return JsonResponse({"code": 200, "msg": "success", "data": None})
+    except Exception as e:
+        print(traceback.format_exc())
+        return JsonResponse({"code": 500, "msg": "failed: " + str(e), "data": None})
+
+
