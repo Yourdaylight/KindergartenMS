@@ -1,6 +1,12 @@
 ## 幼儿园管理系统
-接口文档
-https://documenter.getpostman.com/view/13268592/2s93CPqrqt#9d570996-db98-4f75-b8d3-ed082af3db37
+### 安装使用
+1. 安装python3.6
+2. 命令行在当前路径下打开，执行命令安装依赖包 pip install -r requirements.txt
+3. 执行命令启动服务 python manage.py runserver
+4. 新开命令行进入frontend目录，执行命令安装依赖包 npm install
+5. 执行命令启动前端服务 npm run dev
+6. 浏览器访问http://127.0.0.1:8080
+```
 ---
 |用户角色|管理员|教师|家长|
 |--|--|--|--|

@@ -74,6 +74,7 @@ def report_student(request):
             report_data["student_id"] = student_id
             report_data["teacher_id"] = teacher_id
             report_data["date"] = date
+            report_data["update_time"] = datetime.datetime.now()
             # 提交数据库
             StudentDaily.objects.create(**report_data)
             return JsonResponse({"code": 500, "msg": f"学生不存在", "data": None})
@@ -108,7 +109,7 @@ def search_student_history(request):
             search_dict["student_id"] = student_id
         if teacher_id != -1:
             search_dict["teacher_id"] = teacher_id
-        history_data = StudentDaily.objects.filter(**search_dict)
+        history_data = StudentDaily.objects.filter(**search_dict).order_by("-update_time")
         # 根据日期查询
         if start_date and end_date:
             history_data = history_data.filter(date__range=[start_date, end_date])
@@ -123,7 +124,21 @@ def search_student_history(request):
         except EmptyPage:
             history_data = paginator.page(paginator.num_pages)
         # 将数据转换为字典
-        history_data = [model_to_dict(item) for item in history_data]
+        history_data = [{
+            "id": item.id,
+            "student_id": item.student_id,
+            "teacher_id": item.teacher_id,
+            "study_score": item.study_score,
+            "eat_score": item.eat_score,
+            "sleep_score": item.sleep_score,
+            "social_score": item.social_score,
+            "etiquette_score": item.etiquette_score,
+            "sport_score": item.sport_score,
+            "teacher_comment": item.teacher_comment,
+            "temperature": item.temperature,
+            "date": item.date,
+            "update_time": datetime.datetime.strftime(item.update_time, "%Y-%m-%d %H:%M:%S")
+        } for item in history_data]
         return JsonResponse({"code": 200, "msg": "success", "data": history_data})
     except Exception as e:
         print(traceback.format_exc())

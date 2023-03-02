@@ -56,6 +56,7 @@ class StudentDaily(models.Model):
     sport_score = models.FloatField(null=True)
     # 老师今日对学生的评价
     teacher_comment = models.CharField(max_length=2048)
+    update_time = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.student_id
