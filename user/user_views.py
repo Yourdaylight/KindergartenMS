@@ -1,8 +1,11 @@
 import json
+import datetime
+import traceback
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.forms import model_to_dict
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
-from .models import User
+from .models import User, LeaveMessage
 
 # Create your views here.
 """
@@ -173,5 +176,90 @@ def delete_user(request):
             return JsonResponse({'code': 200, 'msg': 'success', 'data': None})
         else:
             return JsonResponse({'code': 500, 'msg': '用户不存在', 'data': None})
+    except Exception as e:
+        return JsonResponse({'code': 500, 'msg': 'failed: ' + str(e), 'data': None})
+
+
+@require_http_methods(["POST"])
+def leave_message(request):
+    """
+    :param request:
+    :return:
+    """
+    try:
+        req_data = json.loads(request.body)
+        user_id = req_data.get('student_id')
+        message = req_data.get('message')
+        # search in database
+        user = User.objects.filter(id=user_id)
+        if user:
+            # 保存留言
+            today = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            LeaveMessage.objects.create(student_id=user_id, message=message, update_time=today, email=user[0].email, phone=user[0].phone)
+            return JsonResponse({'code': 200, 'msg': 'success', 'data': None})
+        raise Exception('用户不存在')
+    except Exception as e:
+        return JsonResponse({'code': 500, 'msg': 'failed: ' + str(e), 'data': None})
+
+
+@require_http_methods(["POST"])
+def get_leave_messages(request):
+    """
+    获取留言
+    :param request:
+    :return:
+    """
+    try:
+        req_data = json.loads(request.body)
+        # 获取分页参数，默认第一页，每页10条
+        page = req_data.get('page', 1)
+        page_size = req_data.get('page_size', 10)
+        # 根据分页参数和搜索条件查询
+        messages = LeaveMessage.objects.all().order_by('-update_time')
+        # 总数
+        total = messages.count()
+        # 分页
+        paginator = Paginator(messages, page_size)
+        try:
+            messages = paginator.page(page)
+        except PageNotAnInteger:
+            messages = paginator.page(1)
+        except EmptyPage:
+            messages = paginator.page(paginator.num_pages)
+        # 返回结果
+        data = []
+        for message in messages:
+            data.append({
+                'message_id': message.id,
+                'student_id': message.student_id,
+                'message': message.message,
+                'update_time': datetime.datetime.strftime(message.update_time, '%Y-%m-%d %H:%M:%S'),
+                'email': message.email,
+                'phone': message.phone
+            })
+        return JsonResponse({'code': 200, 'msg': 'success', 'data': data, 'total': total})
+
+    except Exception as e:
+        traceback.print_exc()
+        return JsonResponse({'code': 500, 'msg': 'failed: ' + str(e), 'data': None})
+
+
+@require_http_methods(["POST"])
+def delete_leave_message(request):
+    """
+    删除留言
+    :param request:
+    :return:
+    """
+    try:
+        req_data = json.loads(request.body)
+        message_id = req_data.get('message_id')
+        # search in database
+        message = LeaveMessage.objects.filter(id=message_id)
+        if message:
+            message.delete()
+            return JsonResponse({'code': 200, 'msg': 'success', 'data': None})
+        else:
+            return JsonResponse({'code': 500, 'msg': '留言不存在', 'data': None})
     except Exception as e:
         return JsonResponse({'code': 500, 'msg': 'failed: ' + str(e), 'data': None})

@@ -7,6 +7,7 @@ import os
 import json
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import JsonResponse
+from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 import traceback
 import configparser
@@ -88,11 +89,24 @@ def get_board_html(request):
         template_html = template_html.replace("{{sub_info}}", "".join(subsection_html))
         with open("templates/board.html", "w", encoding="utf-8") as f:
             f.write(template_html)
-        return JsonResponse({'code': 200, 'msg': 'success', 'data': template_html})
+        # get my server ip
+
+        href = "http://{}/board".format(request.META['HTTP_HOST'])
+        return JsonResponse({'code': 200, 'msg': 'success', 'data': {"html":template_html,"href": href}})
 
     except Exception as e:
         traceback.print_exc()
         return JsonResponse({'code': 500, 'msg': 'failed: ' + str(e), 'data': os.path.abspath("./")})
+
+
+@require_http_methods(["POST", "GET"])
+def board(request):
+    """
+    公告页面
+    :param request:
+    :return:
+    """
+    return render(request, 'board.html')
 
 
 @require_http_methods(["POST", "GET"])

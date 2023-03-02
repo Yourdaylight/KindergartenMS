@@ -143,6 +143,9 @@ def upload_students_info(request):
         table = request.POST.get("table")
         upload_teacher_id = request.POST.get("teacher_id", -1)
         # 读取文件
+        # 检测文件后缀是否为csv和xls
+        if not file.name.endswith(".csv") and not file.name.endswith(".xls"):
+            raise Exception("文件格式错误，仅支持.csv和.xls格式")
         with open(file.name, "wb") as f:
             for chunk in file.chunks():
                 f.write(chunk)
@@ -175,3 +178,37 @@ def upload_students_info(request):
         return JsonResponse({"code": 500, "msg": "failed: " + str(e), "data": None})
 
 
+@require_http_methods(["POST"])
+def get_recent_days(request):
+    """
+    获取最近30天的StudentDaily数据
+    :return:
+    """
+    try:
+        req_data = json.loads(request.body)
+        student_id = req_data.get("student_id", -1)
+        recent_days = req_data.get("recent_days", 30)
+        today = datetime.date.today()
+        days = [(today - datetime.timedelta(days=i)).strftime("%Y-%m-%d") for i in range(recent_days)]
+        # 根据date升序排序
+        nonull_days = []
+
+        all_data = StudentDaily.objects.filter(date__in=days, student_id=student_id).order_by("date")
+        # 将数据转换为字典
+        fields = ["study_score", "sleep_score", "eat_score", "social_score", "sport_score", "etiquette_score"]
+        fields_cn = ["学习", "睡眠", "饮食", "社交", "运动", "礼仪"]
+        item_dict = {v: {"name": fields_cn[index], "type": "line", "stack": "Total", "data": []} for index, v in enumerate(fields)}
+        for item in all_data:
+            nonull_days.append(item.date.strftime("%Y-%m-%d"))
+            for field in fields:
+                item_dict[field]["data"].append(getattr(item, field))
+        series = [item_dict[field] for field in fields]
+        res = {
+            "series": series,
+            "data": nonull_days
+        }
+
+        return JsonResponse({"code": 200, "msg": "success", "data": res})
+    except Exception as e:
+        print(traceback.format_exc())
+        return JsonResponse({"code": 500, "msg": "failed: " + str(e), "data": None})

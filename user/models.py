@@ -10,19 +10,19 @@ class User(models.Model):
         (3, "Parent"),
     )
     role = models.CharField(max_length=10, choices=user_type_choices)
-    full_name = models.CharField(max_length=100,)
+    full_name = models.CharField(max_length=100, )
     username = models.CharField(max_length=100)
     password = models.CharField(max_length=100)
     email = models.EmailField(max_length=100)
     phone = models.CharField(max_length=100)
     class_no = models.CharField(max_length=100)
-    #设置性别只能是男或女
+    # 设置性别只能是男或女
     sex_choices = (
         ("女", "女"),
         ("男", "男"),
 
     )
-    sex = models.CharField(max_length=3,choices=sex_choices,default="男")
+    sex = models.CharField(max_length=3, choices=sex_choices, default="男")
     update_time = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -66,6 +66,18 @@ class ParentMessage(models.Model):
     student_id = models.CharField(max_length=100)
     message = models.CharField(max_length=2048)
     date = models.DateField()
+
+    def __str__(self):
+        return self.student_id
+
+
+class LeaveMessage(models.Model):
+    student_id = models.CharField(max_length=100)
+    message = models.CharField(max_length=2048)
+    email = models.EmailField(max_length=100, null=True)
+    phone = models.CharField(max_length=100, null=True)
+    update_time = models.DateTimeField(auto_now=True)
+
 
     def __str__(self):
         return self.student_id
