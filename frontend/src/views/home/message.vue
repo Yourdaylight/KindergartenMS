@@ -8,12 +8,12 @@ const message = ref('')
 
 const _leaveMessage = () => {
   //   if code is 200, then get the data
-    leaveMessage({student_id:localStorage.getItem("userId")}).then((res) => {
+    leaveMessage({message:message.value,student_id:localStorage.getItem("userId")}).then((res) => {
         ElMessage({
             message: '留言成功！',
             type: 'success'
         })
-    
+
     }).catch((err) => {
         console.log(err)
     })

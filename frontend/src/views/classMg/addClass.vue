@@ -3,10 +3,10 @@ import { onMounted, reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { addClass, updateClass, searchUser } from '../../api/api'
 import { ElMessage } from 'element-plus'
-import { useRoute } from 'vue-router'
+import { useRoute,useRouter } from 'vue-router'
 
 const route = useRoute()
-
+const router = useRouter()
 const allTeacher = ref([])
 const getTeachers = async () => {
   await searchUser({ role: 2 }).then((res) => {
@@ -60,10 +60,14 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           updateClass(params).then((res) => {
             if (res.code == 200) {
               ElMessage({
-                message: '新增成功！',
+                message: '修改成功！',
                 type: 'success'
               })
-              ruleFormRef.value.resetFields()
+              //跳转到班级列表
+              // route.push({ path: '/classMg' })
+              router.push({
+              path: '/classList'
+            })
             } else {
               ElMessage.error(res.msg)
             }
@@ -122,7 +126,7 @@ const resetForm = (formEl: FormInstance | undefined) => {
     </el-form-item>
 
     <el-form-item>
-      <el-button type="primary" @click="submitForm(ruleFormRef)"> 创建 </el-button>
+      <el-button type="primary" @click="submitForm(ruleFormRef)"> 确认 </el-button>
       <el-button @click="resetForm(ruleFormRef)">重置</el-button>
     </el-form-item>
   </el-form>

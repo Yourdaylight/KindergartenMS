@@ -30,7 +30,7 @@ def report_student(request):
     try:
         req_data = json.loads(request.body)
         # 获取studentdaily表中的所有字段，分数默认为0
-        student_id = req_data.get("student_id", -1)
+        student_id = int(req_data.get("student_id", -1))
         teacher_id = req_data.get("teacher_id")
         study_score = req_data.get("study_score", 0)
         eat_score = req_data.get("eat_score", 0)
@@ -77,7 +77,7 @@ def report_student(request):
             report_data["update_time"] = datetime.datetime.now()
             # 提交数据库
             StudentDaily.objects.create(**report_data)
-            return JsonResponse({"code": 500, "msg": f"学生不存在", "data": None})
+            return JsonResponse({"code": 200, "msg": "success", "data": None})
     except Exception as e:
         print(traceback.format_exc())
         return JsonResponse({"code": 500, "msg": "failed: " + str(e), "data": None})
@@ -103,6 +103,7 @@ def search_student_history(request):
         teacher_id = req_data.get("teacher_id", -1)
         start_date = req_data.get("start_date", "")
         end_date = req_data.get("end_date", "")
+        student_name = ""
         # 根据学生id和教师id查询
         search_dict = {}
         if student_id != -1:
@@ -137,8 +138,13 @@ def search_student_history(request):
             "teacher_comment": item.teacher_comment,
             "temperature": item.temperature,
             "date": item.date,
-            "update_time": datetime.datetime.strftime(item.update_time, "%Y-%m-%d %H:%M:%S")
+            "update_time": datetime.datetime.strftime(item.update_time, "%Y-%m-%d %H:%M:%S"),
+            "student_name": student_name
         } for item in history_data]
+        for daily in history_data:
+            student = User.objects.filter(id=daily["student_id"], role="3")
+            if student:
+                daily["student_name"] = student[0].username
         return JsonResponse({"code": 200, "msg": "success", "data": history_data})
     except Exception as e:
         print(traceback.format_exc())

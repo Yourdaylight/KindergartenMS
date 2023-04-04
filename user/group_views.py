@@ -110,13 +110,15 @@ def search_class_info(request):
             search_dict['class_name__contains'] = class_name
         if class_no:
             search_dict['class_no'] = class_no
-        if teacher_id:
-            search_dict['teacher_id'] = teacher_id
         # 根据条件查询班级信息
         if search_dict:
             class_list = ClassInfo.objects.filter(**search_dict).order_by('-class_no')
         else:
             class_list = ClassInfo.objects.all().order_by('-class_no')
+        # 如果有老师id，则取user中role=2且username=teacher_id的老师id
+        if teacher_id:
+            teacher_id = User.objects.filter(Q(role=2) & Q(username=teacher_id)).values('id')
+            class_list = class_list.filter(teacher_id__in=teacher_id)
         total = class_list.count()
         paginator = Paginator(class_list, page_size)
         try:

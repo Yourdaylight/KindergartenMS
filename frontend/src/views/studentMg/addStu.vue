@@ -79,7 +79,7 @@ const rules = reactive<FormRules>({
   ],
   temperature: [
     {
-      required: true,
+      required: false,
       message: '请选择体温值',
       trigger: 'change'
     }
@@ -138,7 +138,7 @@ const submitUpload = () => {
 }
 
 const formInline = reactive({
-  username: '',
+  username: route.query.username || '',
   class_no: null
 })
 const upData = ref({ table: 'table', teacher_id: localStorage.getItem('userId') })
@@ -189,9 +189,15 @@ const handleEdit = (index: number, row: User) => {
   ruleForm.study_score = editData.study_score ?? 0
   ruleForm.temperature = editData.temperature ?? 0
   ruleForm.teacher_comment = editData.teacher_comment ?? ''
+  ruleForm.student_id = editData.student_id ?? -1
 }
 
 const addDaily = () => {
+  //如果username为空，给出提示信息
+  if (route.query.username == '') {
+    ElMessage.warning('请在学生管理-学生列表-选择学生点击查看每日状态，以完成添加')
+    return
+  }
   addDialogVisible.value = true
   ruleFormRef.value.resetFields()
 }
@@ -218,13 +224,14 @@ const onSubmit = () => {
 
     <el-table :data="tableData" stripe style="width: 100%" size="large">
       <el-table-column prop="date" label="日期" />
+      <el-table-column prop="student_name" label="学生姓名" />
       <el-table-column prop="eat_score" label="吃饭" />
       <el-table-column prop="etiquette_score" label="礼仪" />
       <el-table-column prop="sleep_score" label="睡觉" />
       <el-table-column prop="social_score" label="社交" />
       <el-table-column prop="sport_score" label="运动" />
       <el-table-column prop="study_score" label="学习" />
-      <el-table-column prop="temperature" label="体温" />
+<!--      <el-table-column prop="temperature" label="体温" />-->
       <el-table-column prop="teacher_comment" label="老师评语" />
       <el-table-column label="操作">
         <template #default="scope">
@@ -270,9 +277,9 @@ const onSubmit = () => {
         <el-form-item label="学习" prop="study_score">
           <el-input v-model.number="ruleForm.study_score" placeholder="请输入学习" />
         </el-form-item>
-        <el-form-item label="体温" prop="temperature">
-          <el-input v-model.number="ruleForm.temperature" placeholder="请输入体温" />
-        </el-form-item>
+<!--        <el-form-item label="体温" prop="temperature">-->
+<!--          <el-input v-model.number="ruleForm.temperature" placeholder="请输入体温" />-->
+<!--        </el-form-item>-->
         <el-form-item label="老师评语" prop="teacher_comment">
           <el-input
             :rows="3"
