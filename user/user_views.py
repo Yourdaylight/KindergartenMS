@@ -72,10 +72,7 @@ def update_user(request):
     try:
         req_data = json.loads(request.body)
         user_id = req_data.get('user_id')
-        full_name = req_data.get('full_name')
-        email = req_data.get('email')
-        phone = req_data.get('phone')
-        class_no = req_data.get('class_no')
+        role = req_data.get('role')
         username = req_data.get('username')
         password = req_data.get('password')
 
@@ -83,10 +80,7 @@ def update_user(request):
         user = User.objects.filter(id=user_id)
         if user:
             user = user[0]
-            user.full_name = full_name
-            user.email = email
-            user.phone = phone
-            user.class_no = class_no
+            user.role = role
             user.username = username
             user.password = password
             user.save()

@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
-import type { FormInstance } from 'element-plus'
-import { useRouter } from 'vue-router'
-import { login } from '../api/api'
+import {reactive, ref} from 'vue'
+import type {FormInstance} from 'element-plus'
+import {useRouter} from 'vue-router'
+import {login} from '../api/api'
+import {ElMessage} from "element-plus";
 
 const router = useRouter()
 
@@ -23,8 +24,8 @@ const ruleForm = reactive({
 })
 
 const rules = reactive({
-  passWord: [{ validator: validateRequired, trigger: 'blur' }],
-  userName: [{ validator: validateRequired, trigger: 'blur' }]
+  passWord: [{validator: validateRequired, trigger: 'blur'}],
+  userName: [{validator: validateRequired, trigger: 'blur'}]
 })
 
 const submitForm = (formEl: FormInstance | undefined) => {
@@ -39,19 +40,28 @@ const submitForm = (formEl: FormInstance | undefined) => {
       try {
         login(params).then((res) => {
           const {
-            data: { user_id: userId }
+            data: {user_id: userId}
           } = res
           console.log('submit!', userId)
           localStorage.setItem('userId', userId)
           localStorage.setItem('username', ruleForm.userName)
           localStorage.setItem('role', role.value.toString())
-          router.push({ path: '/home' })
+          router.push({path: '/home'})
         })
       } catch (err) {
         console.log(err)
+        ElMessage({
+          message: '请输入正确的账号或密码',
+          type: 'error'
+        })
       }
     } else {
       console.log('error submit!')
+      //弹窗错误信息
+      ElMessage({
+        message: '请输入正确的账号或密码',
+        type: 'error'
+      })
       return false
     }
   })
@@ -64,37 +74,41 @@ const submitForm = (formEl: FormInstance | undefined) => {
       <span class="login-title">幼儿园儿童管理系统</span>
       <div class="login-box">
         <el-form
-          ref="ruleFormRef"
-          :model="ruleForm"
-          status-icon
-          :rules="rules"
-          label-width="120px"
-          class="demo-ruleForm"
-          label-position="top"
+            ref="ruleFormRef"
+            :model="ruleForm"
+            status-icon
+            :rules="rules"
+            label-width="120px"
+            class="demo-ruleForm"
+            label-position="top"
         >
           <el-form-item label="" prop="userName">
             <el-input
-              v-model="ruleForm.userName"
-              type="text"
-              autocomplete="off"
-              size="large"
-              placeholder="请输入账号"
+                v-model="ruleForm.userName"
+                type="text"
+                autocomplete="off"
+                size="large"
+                placeholder="请输入账号"
             >
               <template #prepend>
-                <el-icon><User /></el-icon>
+                <el-icon>
+                  <User/>
+                </el-icon>
               </template>
             </el-input>
           </el-form-item>
           <el-form-item label="" prop="passWord">
             <el-input
-              v-model="ruleForm.passWord"
-              type="password"
-              autocomplete="off"
-              size="large"
-              placeholder="请输入密码"
+                v-model="ruleForm.passWord"
+                type="password"
+                autocomplete="off"
+                size="large"
+                placeholder="请输入密码"
             >
               <template #prepend>
-                <el-icon><Lock /></el-icon>
+                <el-icon>
+                  <Lock/>
+                </el-icon>
               </template>
             </el-input>
           </el-form-item>
@@ -105,10 +119,11 @@ const submitForm = (formEl: FormInstance | undefined) => {
           <el-radio :label="3">家长</el-radio>
         </el-radio-group>
         <el-button
-          type="primary"
-          @click="submitForm(ruleFormRef)"
-          style="width: 100%; font-size: 16px"
-          >登&nbsp;&nbsp;录</el-button
+            type="primary"
+            @click="submitForm(ruleFormRef)"
+            style="width: 100%; font-size: 16px"
+        >登&nbsp;&nbsp;录
+        </el-button
         >
       </div>
     </div>
@@ -119,27 +134,34 @@ const submitForm = (formEl: FormInstance | undefined) => {
 ::v-deep .el-form-item__content .el-input-group {
   height: 44px;
 }
+
 ::v-deep .el-form-item {
   margin-bottom: 24px;
 }
+
 ::v-deep .el-radio-group {
   margin-bottom: 20px;
 }
+
 ::v-deep .el-button--primary {
   height: 42px;
 }
+
 .page-container {
   height: 100%;
   background: url('../assets/images/background.jpg') no-repeat left 10%;
   background-size: cover;
+
   & > div {
     height: 90px;
+
     &:nth-child(2) {
       height: calc(100% - 180px);
       display: flex;
       align-items: center;
       justify-content: center;
       flex-direction: column;
+
       .login-box {
         width: 420px;
         height: 320px;
@@ -148,6 +170,7 @@ const submitForm = (formEl: FormInstance | undefined) => {
         border-radius: 8px;
         box-shadow: var(--el-box-shadow);
       }
+
       .login-title {
         color: #fff;
         font-size: 34px;

@@ -11,7 +11,8 @@ const formSize = ref('default')
 const ruleFormRef = ref<FormInstance>()
 const ruleForm = reactive({
   username: route.query.username ?? '',
-  password: '',
+  user_id: route.query.user_id ?? '',
+  password: route.query.password ?? '',
   role: route.query.role ?? null
 })
 
@@ -49,7 +50,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           updateUser(params).then((res) => {
             if (res.code == 200) {
               ElMessage({
-                message: '新增成功！',
+                message: '更新成功！',
                 type: 'success'
               })
               ruleFormRef.value.resetFields()
@@ -108,7 +109,7 @@ const resetForm = (formEl: FormInstance | undefined) => {
     </el-form-item>
 
     <el-form-item>
-      <el-button type="primary" @click="submitForm(ruleFormRef)"> 创建 </el-button>
+      <el-button type="primary" @click="submitForm(ruleFormRef)"> 创建/更新 </el-button>
       <el-button @click="resetForm(ruleFormRef)">重置</el-button>
     </el-form-item>
   </el-form>

@@ -110,7 +110,8 @@ def search_student_history(request):
             search_dict["student_id"] = student_id
         if teacher_id != -1:
             search_dict["teacher_id"] = teacher_id
-        history_data = StudentDaily.objects.filter(**search_dict).order_by("-update_time")
+        # 先根据date降序，再根据update_time降序
+        history_data = StudentDaily.objects.filter(**search_dict).order_by("-date", "-update_time")
         # 根据日期查询
         if start_date and end_date:
             history_data = history_data.filter(date__range=[start_date, end_date])

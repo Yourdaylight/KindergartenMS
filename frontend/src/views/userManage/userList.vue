@@ -62,8 +62,7 @@ const getUser = () => {
 getUser()
 
 const handleEdit = (index: number, row: User) => {
-  console.log(index, row)
-  router.push({path: '/addUser', query: {username: row.username, role: row.role}})
+  router.push({path: '/addUser', query: {username: row.username, role: row.role,user_id:row.user_id}})
 }
 const handleDelete = (index: number, row: User) => {
   deleteUser({user_id: (<any>row).user_id}).then((res) => {
