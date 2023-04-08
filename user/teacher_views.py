@@ -30,7 +30,7 @@ def report_student(request):
     try:
         req_data = json.loads(request.body)
         # 获取studentdaily表中的所有字段，分数默认为0
-        student_id = int(req_data.get("student_id", -1))
+        student_id = req_data.get("student_id") if req_data.get("student_id") else -1
         teacher_id = req_data.get("teacher_id")
         study_score = req_data.get("study_score", 0)
         eat_score = req_data.get("eat_score", 0)
@@ -69,7 +69,8 @@ def report_student(request):
         # 存在则更新
         if student_daily:
             student_daily.update(**report_data)
-            return JsonResponse({"code": 200, "msg": "success", "data": None})
+            # 保存更新数据
+            return JsonResponse({"code": 200, "msg": "更新成功", "data": None})
         else:
             report_data["student_id"] = student_id
             report_data["teacher_id"] = teacher_id
@@ -77,7 +78,7 @@ def report_student(request):
             report_data["update_time"] = datetime.datetime.now()
             # 提交数据库
             StudentDaily.objects.create(**report_data)
-            return JsonResponse({"code": 200, "msg": "success", "data": None})
+            return JsonResponse({"code": 200, "msg": "新增成功", "data": None})
     except Exception as e:
         print(traceback.format_exc())
         return JsonResponse({"code": 500, "msg": "failed: " + str(e), "data": None})
@@ -101,11 +102,13 @@ def search_student_history(request):
         # 根据student_id和teacher_id查询
         student_id = req_data.get("student_id", -1)
         teacher_id = req_data.get("teacher_id", -1)
-        start_date = req_data.get("start_date", "")
-        end_date = req_data.get("end_date", "")
+        # start_date 默认为30天前
+        start_date = req_data.get("start_date", datetime.datetime.now() - datetime.timedelta(days=30))
+        # end_date 默认为今天
+        end_date = req_data.get("end_date", datetime.datetime.now())
         student_name = ""
-        # 根据学生id和教师id查询
         search_dict = {}
+        # 根据学生id和教师id查询
         if student_id != -1:
             search_dict["student_id"] = student_id
         if teacher_id != -1:

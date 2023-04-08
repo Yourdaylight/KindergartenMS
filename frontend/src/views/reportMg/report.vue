@@ -12,6 +12,7 @@ const todaySeries = ref([])
 const todayComment= ref('老师今天没有给你留言哦')
 const currentUser = ref(localStorage.getItem('username'))
 const updateTime = ref('')
+const commentDate = ref('')
 const getStudentDays = async () => {
   try {
     const params = {
@@ -29,7 +30,7 @@ const getStudentDays = async () => {
     })
     await getHistory({ student_id: localStorage.getItem('userId')}).then((res) => {
       const { data: Data } = res
-      let todayData = Data[Data.length - 1]
+      let todayData = Data[0]
       let field = [
         'study_score',
         'sleep_score',
@@ -44,6 +45,7 @@ const getStudentDays = async () => {
       })
       todayComment.value = todayData.teacher_comment
       updateTime.value = todayData.update_time
+      commentDate.value = todayData.date
     })
   } catch (err) { }
 }
@@ -135,7 +137,7 @@ onMounted(async () => {
         </div>
       </el-card>
     </div>
-    <div class="right-conner">更新时间：{{ updateTime }}</div>
+    <div class="right-conner">更新时间：{{ commentDate }}</div>
   </div>
   <el-button type="primary" @click="onClickDownLoad">下载PDF报告</el-button>
 </template>
