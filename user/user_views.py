@@ -223,6 +223,11 @@ def get_leave_messages(request):
             messages = paginator.page(paginator.num_pages)
         # 返回结果
         data = []
+        # 根据Message的id查询对应的user
+        student_ids = [message.student_id for message in messages]
+        students = User.objects.filter(id__in=student_ids)
+        # 组装数据
+        student_id_name_dict = {student.id: student.username for student in students}
         for message in messages:
             data.append({
                 'message_id': message.id,
@@ -230,7 +235,8 @@ def get_leave_messages(request):
                 'message': message.message,
                 'update_time': datetime.datetime.strftime(message.update_time, '%Y-%m-%d %H:%M:%S'),
                 'email': message.email,
-                'phone': message.phone
+                'phone': message.phone,
+                'username': student_id_name_dict.get(int(message.student_id))
             })
         return JsonResponse({'code': 200, 'msg': 'success', 'data': data, 'total': total})
 
