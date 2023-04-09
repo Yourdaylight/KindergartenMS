@@ -8,7 +8,7 @@ const router = useRouter()
 
 const formInline = reactive({
   username: '',
-  class_no: null
+  class_no: ''
 })
 
 interface User {
@@ -24,12 +24,13 @@ enum roleType {
 
 const tableData = ref()
 const classList = ref({})
-const allClass = ref([])
+const allClass = ref([{ label: '全部', value: '' }])
 
 const getClass = async () => {
   await searchClass({}).then((res) => {
     const { data: Data } = res
     tableData.value = Data
+    console.log(Data, 123)
     Data.forEach((el) => {
       classList.value[el.class_no] = el.class_name
       allClass.value.push({ label: el.class_name, value: el.class_no })
@@ -90,7 +91,6 @@ const onSubmit = () => {
         <el-button type="primary" @click="getUser()">查询</el-button>
       </el-form-item>
     </el-form>
-
     <el-table :data="tableData" stripe style="width: 100%" size="large">
       <el-table-column prop="username" label="用户名" />
       <el-table-column prop="class_no" label="班级号">

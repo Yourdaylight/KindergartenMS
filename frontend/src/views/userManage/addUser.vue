@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import { register, updateUser } from '../../api/api'
+import { register, updateUser, searchClass } from '../../api/api'
 import { ElMessage } from 'element-plus'
 import { useRoute } from 'vue-router'
 
@@ -13,7 +13,8 @@ const ruleForm = reactive({
   username: route.query.username ?? '',
   user_id: route.query.user_id ?? '',
   password: route.query.password ?? '',
-  role: route.query.role ?? null
+  role: route.query.role ?? null,
+  class_no: route.query.class_no ?? ''
 })
 
 const rules = reactive<FormRules>({
@@ -37,8 +38,34 @@ const rules = reactive<FormRules>({
       message: '请选择用户角色',
       trigger: 'change'
     }
+  ],
+  class_no: [
+    {
+      required: true,
+      message: '请选择班级',
+      trigger: 'change'
+    }
   ]
 })
+
+const classList = ref([])
+const getUser = () => {
+  try {
+    let params = {
+      class_no: '',
+      class_name: '',
+      teacher_id: null
+    }
+    searchClass(params).then((res) => {
+      const { data: Data } = res
+      // 单独获取班级列表
+      Data.forEach((el) => {
+        classList.value.push({ label: el.class_name, value: el.class_no })
+      })
+    })
+  } catch (err) {}
+}
+getUser()
 
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
@@ -105,6 +132,16 @@ const resetForm = (formEl: FormInstance | undefined) => {
         <el-option label="系统管理员" value="1" />
         <el-option label="教师" value="2" />
         <el-option label="家长" value="3" />
+      </el-select>
+    </el-form-item>
+    <el-form-item v-if="ruleForm.role == '3'" label="班级" prop="class_no">
+      <el-select v-model="ruleForm.class_no" placeholder="请选择班级" size="large">
+        <el-option
+          :label="item.label"
+          :value="item.value"
+          v-for="(item, index) in classList"
+          :key="index"
+        />
       </el-select>
     </el-form-item>
 
