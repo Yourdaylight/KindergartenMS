@@ -50,12 +50,13 @@ def register(request):
         username = req_data.get('username')
         password = req_data.get('password')
         role = req_data.get('role')
+        class_no = req_data.get('class_no','')
         # search in database
         user = User.objects.filter(username=username, role=role)
         if user:
             return JsonResponse({'code': 500, 'msg': f'用户名{username}已存在', 'data': None})
         else:
-            user = User(username=username, password=password, role=role)
+            user = User(username=username, password=password, role=role,class_no=class_no)
             user.save()
             return JsonResponse({'code': 200, 'msg': 'success', 'data': None})
     except Exception as e:
